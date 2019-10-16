@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>No Login Image Share</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js" integrity="sha256-c9vxcXyAG4paArQG3xk6DjyW/9aHxai2ef9RpMWO44A=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/platform/1.3.5/platform.min.js" integrity="sha256-a5JlAx3qX6Rkvx+38zcjAPQLDQVUIwwwUeOrlDQ5W8s=" crossorigin="anonymous"></script>
+  <script src="./fitty.min.js"></script>
+  <script>
+    const inputHandler = e => {
+      document.getElementById('message').innerHTML = e.value.replace(/\n/g, '<br>').replace(/ /g, '&nbsp;')
+    }
+
+    async function share() {
+      const blob = await domtoimage.toBlob(document.getElementById('image-container'))
+      const image = new File([blob], 'tmp.png', {type: 'image/png'})
+      if (!navigator.share || platform.name !== 'Chrome Mobile' || parseInt(platform.version) < 75) {
+        alert('あなたがお使いの環境は対応していません。\nAndroid Chrome 75以上をお使いください。')
+        return
+      }
+
+
+      navigator.share({
+        text: 'アプリ連携無しで画像がシェアできました！',
+        url: 'https://tohutohu.github.io/no-login-image-share/',
+        files: [image]
+      }).then(() => {
+        console.log('Share was successful.')
+      }).catch((error) => {
+        console.log('Sharing failed', error)
+      });
+    }
+
+    window.onload = () => {
+      document.getElementById('message').innerText = 'Some Text'
+      document.getElementById('text').value = 'Some Text'
+      fitty('#message')
+    }
+  </script>
+  <link rel="stylesheet" href="./font.css">
+  <style>
+    #image-container {
+      background-color: white;
+      display: inline-block;
+      background-image: url("./image.png");
+      background-size: contain;
+      width: 400px;
+      height: 258px;
+    }
+
+    #message-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      top: 20px;
+      left: 53px;
+      width: 300px;
+      height: 177px;
+    }
+
+    #message {
+      word-break: break-all;
+      font-family: 'Kosugi Maru', sans-serif;
+    }
+  </style>
+</head>
+<body>
+<h1>No Login Image Share</h1>
+<p>ログインすることなく画像をシェアすることができることのテストページ</p>
+<div id="image-container">
+  <div id="message-container">
+    <div id="message"></div>
+  </div>
+</div>
+<div>
+  <p>
+    文字を入力
+  </p>
+  <textarea id="text" oninput="inputHandler(this)"></textarea>
+  <button onclick="share()">Share!</button>
+  <p id="warning">Android Chrome 75以上でのみ動作します。</p>
+  <p>画像仕様元: ふきだし素材専門サイト「フキダシデザイン」(<a href="https://fukidesign.com/">https://fukidesign.com/</a>)</p>
+</div>
+</body>
+</html>
